@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'corsheaders'
+    'corsheaders',
     'rest_framework',
     'TextAnywhere',
 ]
@@ -137,3 +137,6 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
