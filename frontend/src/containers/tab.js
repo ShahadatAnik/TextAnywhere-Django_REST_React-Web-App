@@ -1,16 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { Tab, Grid, Button, TextField } from "@mui/material";
+import { Tab, Grid, Button, TextField, IconButton } from "@mui/material";
 import { TabList, TabContext, TabPanel } from "@mui/lab";
 import ApiService from "../ApiService";
 import { useParams } from "react-router-dom";
 
 import CloseIcon from "@mui/icons-material/Close";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
+import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+
+import Snackbar from "./snackbars";
 
 export default function Tabs() {
   const [selectedTab, setSelectedTab] = useState();
   const [tabs, setTabs] = useState([]);
-  const [desc, set_desc] = useState();
+  const [tabDesc, set_desc] = useState();
+
+  const [openSnackbar, set_OpenSnackbar] = useState(false);
+  const [type, set_Type] = useState("");
 
   const { userName } = useParams();
 
@@ -34,13 +41,16 @@ export default function Tabs() {
   const newTab = () => {
     ApiService.NewTab({
       userName,
-    }).then((resp) => setTabs([...tabs, resp]));
-    setSelectedTab(tabs[0].id);
+    })
+      .then((resp) => setTabs([...tabs, resp]))
+      .then((resp) => setSelectedTab(resp.id));
+    // set_OpenSnackbar(!openSnackbar);
+    // set_Type("insert");
   };
 
   // update tab
   const updatedInformation = (new_) => {
-    const new_userList = tabs.map((old_) => {
+    const new_List = tabs.map((old_) => {
       if (new_.id === old_.id) {
         return new_;
       } else {
@@ -48,16 +58,18 @@ export default function Tabs() {
       }
     });
 
-    setTabs(new_userList);
+    setTabs(new_List);
+    // set_OpenSnackbar(!openSnackbar);
+    // set_Type("update");
   };
 
   const updateTab = (tab_id) => {
     ApiService.UpdateTab(tab_id, {
-      desc,
+      tabDesc,
     })
       .then((resp) => updatedInformation(resp))
       .catch((error) => console.log(error));
-    setSelectedTab(tabs[0].id);
+    setSelectedTab(tab_id);
   };
 
   //delete tab
@@ -65,6 +77,8 @@ export default function Tabs() {
     const tabArr = tabs.filter((x) => x.id !== value);
     setTabs(tabArr);
     setSelectedTab(tabs[0].id);
+    // set_OpenSnackbar(!openSnackbar);
+    // set_Type("delete");
   };
 
   const handleTabClose = (value) => {
@@ -72,30 +86,42 @@ export default function Tabs() {
       .then(() => deleteBtn(value))
       .catch((error) => console.log(error));
   };
+  // const styles = {
+  //   input: {
+  //     color: "white",
+  //   },
+  // };
+  // InputProps={{ style: styles.input }}
 
   return (
     <div>
-      {tabs.map((d) => (
-        <div key={d.id}>
-          {d.userName}, {d.tabName}
-        </div>
-      ))}
-
+      <Button
+        variant="contained"
+        size="small"
+        endIcon={<AddOutlinedIcon />}
+        onClick={newTab}
+        center
+      >
+        ADD
+      </Button>
       <TabContext value={selectedTab}>
-        <Grid item xs={12} md={6}>
-          <Button onClick={newTab} variant="contained" color="primary">
-            New Tab
-          </Button>
-        </Grid>
-        <TabList onChange={handleChange} aria-label="lab API tabs example">
+        <TabList
+          aria-label="full width tabs example"
+          onChange={handleChange}
+          variant="scrollable"
+          scrollButtons="auto"
+        >
+          {" "}
           {tabs
             .filter((it) => it.userName === userName)
             .map((tab) => (
               <Tab
                 icon={
-                  <CloseIcon
-                    color="danger"
+                  <DeleteOutlineOutlinedIcon
                     onClick={(e) => handleTabClose(tab.id)}
+                    style={{
+                      color: "red",
+                    }}
                   />
                 }
                 iconPosition="end"
@@ -105,18 +131,19 @@ export default function Tabs() {
               />
             ))}
         </TabList>
-
         {tabs
           .filter((it) => it.userName === userName)
           .map((panel) => (
             <TabPanel key={panel.id} value={panel.id}>
               <TextField
-                variant="filled"
+                variant="outlined"
+                fullWidth
                 multiline
-                value={panel.tabDesc}
-                onChange={(e) => set_desc(e.target.value)} // not working
+                rows={21}
+                defaultValue={panel.tabDesc}
+                onChange={(e) => set_desc(e.target.value)}
               />
-
+              <br /> <br />
               <Button
                 size="large"
                 variant="contained"
@@ -124,12 +151,14 @@ export default function Tabs() {
                 type="submit"
                 className=" rounded-3 text-white fw-bold fs-4"
                 onClick={() => updateTab(panel.id)}
+                style={{ width: "100%" }}
               >
                 Save
               </Button>
             </TabPanel>
           ))}
       </TabContext>
+      {openSnackbar ? <Snackbar type={type} /> : null}
     </div>
   );
 }
