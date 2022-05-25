@@ -9,13 +9,13 @@ import NotFound from "./containers/NotFound";
 function App() {
   return (
     <BrowserRouter>
-          <Routes>
-            <Route path="*" element={<NotFound />} />
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/tab" element={<Tab />} />
-          </Routes>
-      </BrowserRouter>
+      <Routes>
+        <Route path="*" element={<NotFound />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/:userName" element={<Tab />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
