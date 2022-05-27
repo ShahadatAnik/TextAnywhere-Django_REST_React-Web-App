@@ -24,92 +24,8 @@ import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 
 import Snackbar from "./snackbars";
-// import ConfirmationDialogRaw from "./loginDialog";
-import { width } from "@mui/system";
+import ConfirmationDialogRaw from "./loginDialog";
 
-const initBeforeUnLoad = (showExitPrompt) => {
-  window.onbeforeunload = (event) => {
-    // Show prompt based on state
-    if (showExitPrompt) {
-      const e = event || window.event;
-      e.preventDefault();
-      if (e) {
-        e.returnValue = "";
-      }
-      return "";
-    }
-  };
-};
-
-//pop up
-function ConfirmationDialogRaw(props) {
-  const { onClose, value: valueProp, open, ...other } = props;
-  const [value, setValue] = React.useState(valueProp);
-  const radioGroupRef = React.useRef(null);
-
-  React.useEffect(() => {
-    if (open) {
-      setValue(valueProp);
-    }
-  }, [valueProp, open]);
-
-  const handleEntering = () => {
-    if (radioGroupRef.current != null) {
-      radioGroupRef.current.focus();
-    }
-  };
-
-  const handleOk = () => {
-    onClose(value);
-  };
-
-  //   const handleChange = (event) => {
-  //     setValue(event.target.value);
-  //   };
-
-  return (
-    <Dialog
-      sx={{ "& .MuiDialog-paper": { width: "80%", maxHeight: 500 } }}
-      maxWidth="xs"
-      TransitionProps={{ onEntering: handleEntering }}
-      open={open}
-      {...other}
-    >
-      <DialogTitle>Password Required</DialogTitle>
-      <DialogContent dividers>
-        <Typography
-          variant="h5"
-          component="div"
-          sx={{ fontFamily: "Monospace" }}
-        >
-          This site is already occupied.
-          <br /> If this is your site enter the password, or you can try using
-          different site.
-        </Typography>
-      </DialogContent>
-      <DialogActions>
-        <TextField
-          variant="outlined"
-          size="large"
-          fullWidth
-          autoFocus={true}
-          inputProps={{ style: { fontSize: 15 } }}
-          onChange={(event) => {
-            setValue(event.target.value);
-          }}
-          validation
-        />
-        <Button onClick={handleOk}>Ok</Button>
-      </DialogActions>
-    </Dialog>
-  );
-}
-
-ConfirmationDialogRaw.propTypes = {
-  onClose: PropTypes.func.isRequired,
-  open: PropTypes.bool.isRequired,
-  value: PropTypes.string.isRequired,
-};
 
 // main
 
@@ -196,16 +112,7 @@ export default function Tabs() {
   //   },
   // };
   // InputProps={{ style: styles.input }}
-  const [showExitPrompt, setShowExitPrompt] = useState(false);
 
-  window.onload = function () {
-    initBeforeUnLoad(showExitPrompt);
-  };
-
-  // Re-Initialize the onbeforeunload event listener
-  useEffect(() => {
-    initBeforeUnLoad(showExitPrompt);
-  }, [showExitPrompt]);
 
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("");

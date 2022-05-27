@@ -1,10 +1,8 @@
+import { useState, useEffect } from "react";
 import * as React from "react";
 import PropTypes from "prop-types";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemText from "@mui/material/ListItemText";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
@@ -13,66 +11,125 @@ import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
 
-const options = [
-  "None",
-  "Atria",
-  "Callisto",
-  "Dione",
-  "Ganymede",
-  "Hangouts Call",
-  "Luna",
-  "Oberon",
-  "Phobos",
-  "Pyxis",
-  "Sedna",
-  "Titania",
-  "Triton",
-  "Umbriel",
-];
+import Snackbar from "@mui/material/Snackbar";
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
 
-export default function ConfirmationDialogRaw(props) {
+import { useParams, useNavigate } from "react-router-dom";
+
+function ConfirmationDialogRaw(props) {
   const { onClose, value: valueProp, open, ...other } = props;
-  const [value, setValue] = React.useState(valueProp);
-  const radioGroupRef = React.useRef(null);
+  const [value, setValue] = useState(valueProp);
+  const [userInfo, set_userInfo] = useState([]);
+  let navigate = useNavigate();
 
-  React.useEffect(() => {
-    if (!open) {
+  const { userName } = useParams();
+
+  useEffect(() => {
+    if (open) {
       setValue(valueProp);
     }
   }, [valueProp, open]);
 
-  const handleEntering = () => {
-    if (radioGroupRef.current != null) {
-      radioGroupRef.current.focus();
-    }
-  };
+  useEffect(() => {
+    fetch(`http://127.0.0.1:8000/ta/info/`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((resp) => resp.json())
+      .then((resp) => set_userInfo(resp))
+      .catch((error) => console.log(error));
+  }, []);
 
   const handleOk = () => {
-    onClose(value);
+    const [user] = userInfo.filter((it) => it.userName === userName);
+    console.log(user);
+    if (user.password === value) {
+      onClose(value);
+      console.log("handleOk");
+    } else {
+      handleClick();
+    }
+    if (user.length() < 0) {
+      // need to fix
+      alert("Wrong address");
+    }
+
+    // console.log("")
   };
 
-  //   const handleChange = (event) => {
-  //     setValue(event.target.value);
-  //   };
+  // snakbar
+  const [openSnackbar, setOpenSnackbar] = React.useState(false);
+
+  const handleClick = () => {
+    setOpenSnackbar(true);
+  };
+
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpenSnackbar(false);
+  };
+
+  const action = (
+    <React.Fragment>
+      <IconButton
+        size="small"
+        aria-label="close"
+        color="inherit"
+        onClick={handleCloseSnackbar}
+      >
+        <CloseIcon fontSize="small" />
+      </IconButton>
+    </React.Fragment>
+  );
 
   return (
     <Dialog
-      sx={{ "& .MuiDialog-paper": { width: "80%", maxHeight: 500 } }}
+      sx={{
+        "& .MuiDialog-paper": {
+          width: "80%",
+          maxHeight: 500,
+          boxShadow: 3,
+          justifyContent: "center",
+        },
+        backdropFilter: "blur(5px)",
+      }}
       maxWidth="xs"
-      TransitionProps={{ onEntering: handleEntering }}
       open={open}
       {...other}
     >
-      <DialogTitle>Password Required</DialogTitle>
+      <DialogTitle
+        sx={{
+          textTransform: "uppercase",
+          fontWeight: "bold",
+          fontSize: "h4.fontSize",
+          fontFamily: "Monospace",
+          flexGrow: 1,
+          textAlign: "center",
+          color: "error.main",
+        }}
+      >
+        Password Required
+      </DialogTitle>
       <DialogContent dividers>
         <Typography
           variant="h5"
           component="div"
-          sx={{fontFamily: "Monospace" }}
+          sx={{ fontFamily: "Monospace" }}
         >
           This site is already occupied.
-          <br /> If this is your site enter the password, or you can try using
-          different site.
+          <br />
+          <br /> If this is your site enter the password, or{" "}
+          <Button variant="contained" onClick={() => navigate(`/`)}>
+            {" "}
+            Register Here
+          </Button>
+          <br />
         </Typography>
       </DialogContent>
       <DialogActions>
@@ -81,12 +138,30 @@ export default function ConfirmationDialogRaw(props) {
           size="large"
           fullWidth
           autoFocus={true}
+          type="password"
           inputProps={{ style: { fontSize: 15 } }}
-          onChange={(e) => {}}
+          onChange={(event) => {
+            setValue(event.target.value);
+          }}
           validation
         />
-        <Button onClick={handleOk}>Ok</Button>
+        <Button
+          variant="contained"
+          color="success"
+          sx={{ ml: 2 }}
+          onClick={handleOk}
+        >
+          ENTER
+        </Button>
       </DialogActions>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={2000}
+        onClose={handleCloseSnackbar}
+        message="Wrong Password"
+        action={action}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      />
     </Dialog>
   );
 }
@@ -97,52 +172,38 @@ ConfirmationDialogRaw.propTypes = {
   value: PropTypes.string.isRequired,
 };
 
- function ConfirmationDialog() {
-  const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState("Dione");
+export default function ConfirmationDialog() {
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState("");
 
   const handleClickListItem = () => {
     setOpen(true);
   };
 
   const handleClose = (newValue) => {
-    setOpen(false);
-
     if (newValue) {
       setValue(newValue);
     }
+    setOpen(false);
   };
+
+  useEffect(() => {
+    window.addEventListener("beforeunload", alertUser);
+    handleClickListItem();
+    return () => {
+      window.removeEventListener("beforeunload", alertUser);
+    };
+  }, []);
+  const alertUser = (e) => {};
 
   return (
     <Box sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}>
-      <List component="div" role="group">
-        <ListItem button divider disabled>
-          <ListItemText primary="Interruptions" />
-        </ListItem>
-        <ListItem
-          button
-          divider
-          aria-haspopup="true"
-          aria-controls="ringtone-menu"
-          aria-label="phone ringtone"
-          onClick={handleClickListItem}
-        >
-          <ListItemText primary="Phone ringtone" secondary={value} />
-        </ListItem>
-        <ListItem button divider disabled>
-          <ListItemText
-            primary="Default notification ringtone"
-            secondary="Tethys"
-          />
-        </ListItem>
-        <ConfirmationDialogRaw
-          id="ringtone-menu"
-          keepMounted
-          open={open}
-          onClose={handleClose}
-          value={value}
-        />
-      </List>
+      <ConfirmationDialogRaw
+        keepMounted
+        open={open}
+        onClose={handleClose}
+        value={value}
+      />
     </Box>
   );
 }
