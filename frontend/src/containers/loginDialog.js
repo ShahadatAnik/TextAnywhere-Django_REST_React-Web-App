@@ -45,7 +45,6 @@ function ConfirmationDialogRaw(props) {
 
   const handleOk = () => {
     const [user] = userInfo.filter((it) => it.userName === userName);
-    console.log(user);
     if (user.password === value) {
       onClose(value);
       console.log("handleOk");
@@ -150,6 +149,11 @@ function ConfirmationDialogRaw(props) {
           color="success"
           sx={{ ml: 2 }}
           onClick={handleOk}
+          // onKeyPress={(e) => {
+          //   if (e.key === "Enter") {
+          //     handleOk();
+          //   }
+          // }}
         >
           ENTER
         </Button>

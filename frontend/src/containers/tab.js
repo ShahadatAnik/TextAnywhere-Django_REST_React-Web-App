@@ -17,15 +17,13 @@ import {
 import PropTypes from "prop-types";
 import { TabList, TabContext, TabPanel } from "@mui/lab";
 import ApiService from "../ApiService";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 
-import Snackbar from "./snackbars";
 import ConfirmationDialogRaw from "./loginDialog";
-
 
 // main
 
@@ -35,10 +33,19 @@ export default function Tabs() {
   const [tabName, set_tabName] = useState();
   const [tabDesc, set_desc] = useState();
 
-  const [openSnackbar, set_OpenSnackbar] = useState(false);
-  const [type, set_Type] = useState("");
-
   const { userName } = useParams();
+  let navigate = useNavigate();
+
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState("");
+
+  const handleClose = (newValue) => {
+    setOpen(false);
+
+    if (newValue) {
+      setValue(newValue);
+    }
+  };
 
   useEffect(() => {
     fetch(`http://127.0.0.1:8000/ta/tab/`, {
@@ -106,48 +113,50 @@ export default function Tabs() {
       .then(() => deleteInfo(value))
       .catch((error) => console.log(error));
   };
-  // const styles = {
-  //   input: {
-  //     color: "white",
-  //   },
-  // };
-  // InputProps={{ style: styles.input }}
-
-
-  const [open, setOpen] = useState(false);
-  const [value, setValue] = useState("");
-
-  useEffect(() => {
-    if (performance.navigation.type === 1) {
-      setOpen(false);
-    } else {
-      setOpen(false);
-    }
-  });
-
-  const handleClose = (newValue) => {
-    setOpen(false);
-
-    if (newValue) {
-      setValue(newValue);
-    }
-  };
 
   return (
     <Container maxWidth="mx">
-      <AppBar position="static">
-        <Toolbar>
+      <AppBar position="static" sx={{
+              flexGrow: 1,
+              fontFamily: "Monospace",
+              mr: 1.5,
+              ml: 1.5,
+              
+            }}>
+        <Toolbar
+          sx={{
+            alignItems: "center",
+          }}
+        >
           <Typography
             variant="h6"
             component="div"
-            sx={{ flexGrow: 1, fontFamily: "Monospace" }}
+            sx={{
+              flexGrow: 1,
+              fontFamily: "Monospace",
+              mr: 1.5,
+              ml: 1.5,
+              mt: 0.5,
+              mb: 0.5,
+              p: 0.5,
+            }}
+            onClick={() => navigate(`/`)}
           >
             TextAnywhere
           </Typography>
           <Typography
             variant="body"
             component="div"
-            sx={{ flexGrow: 1, fontFamily: "Monospace" }}
+            sx={{
+              flexGrow: 1.5,
+              fontFamily: "Monospace",
+              mr: 1.5,
+              ml: 1.5,
+              mt: 0.5,
+              mb: 0.5,
+              p: 0.5,
+              
+            }}
           >
             "Save Before Jump Into Another Tab"
           </Typography>
@@ -170,6 +179,10 @@ export default function Tabs() {
           onChange={handleChange}
           variant="scrollable"
           scrollButtons="auto"
+          sx={{
+            color: "red",
+            m: 0.05,
+          }}
         >
           {tabs
             .filter((it) => it.userName === userName)
@@ -177,18 +190,21 @@ export default function Tabs() {
               <Tab
                 icon={
                   <DeleteOutlineOutlinedIcon
+                    size="small"
                     onClick={(e) => handleTabClose(tab.id)}
-                    style={{
-                      color: "red",
+                    sx={{
+                      fill: "red",
+                      width: "0.8em",
                     }}
                   />
                 }
                 selected={true}
-                iconWrapper={true}
-                wrapped
-                fullWidth={true}
                 iconPosition="end"
-                sx={{ minWidth: "fit-content" }}
+                sx={
+                  {
+                    // minWidth: "fit-content",
+                  }
+                }
                 key={tab.id}
                 label={tab.tabName}
                 value={tab.id}
@@ -202,6 +218,7 @@ export default function Tabs() {
               <TextField
                 variant="outlined"
                 size="small"
+                required
                 fullWidth
                 multiline
                 minRows={10}
@@ -232,7 +249,6 @@ export default function Tabs() {
             </TabPanel>
           ))}
       </TabContext>
-      {openSnackbar ? <Snackbar type={type} /> : null}
       <ConfirmationDialogRaw
         keepMounted
         open={open}

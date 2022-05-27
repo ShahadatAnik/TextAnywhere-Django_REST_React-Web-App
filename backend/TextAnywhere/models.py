@@ -19,7 +19,7 @@ class UserInfo(models.Model):
 
 class UserTab(models.Model):
     userName = models.CharField(max_length=100, null=True)
-    tabName = models.CharField(max_length=100, default="Empty Tab", null=False)
+    tabName = models.CharField(max_length=100, default="Empty Tab", null=True)
     tabDesc = models.CharField(max_length=100000, default="", null=False)
 
     Updated = models.DateTimeField(auto_now=True)
