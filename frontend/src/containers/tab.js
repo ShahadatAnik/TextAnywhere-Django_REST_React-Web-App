@@ -37,7 +37,7 @@ export default function Tabs() {
   let navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState();
 
   const handleClose = (newValue) => {
     setOpen(false);
@@ -71,7 +71,7 @@ export default function Tabs() {
       userName,
     })
       .then((resp) => setTabs([...tabs, resp]))
-      .then((resp) => setSelectedTab(resp.id));
+      .then((resp) => setSelectedTab(tabs[tabs.length - 1].id));
   };
 
   // update tab
@@ -116,13 +116,15 @@ export default function Tabs() {
 
   return (
     <Container maxWidth="mx">
-      <AppBar position="static" sx={{
-              flexGrow: 1,
-              fontFamily: "Monospace",
-              mr: 1.5,
-              ml: 1.5,
-              
-            }}>
+      <AppBar
+        position="static"
+        sx={{
+          flexGrow: 1,
+          fontFamily: "Monospace",
+          mr: 1.5,
+          ml: 1.5,
+        }}
+      >
         <Toolbar
           sx={{
             alignItems: "center",
@@ -155,7 +157,6 @@ export default function Tabs() {
               mt: 0.5,
               mb: 0.5,
               p: 0.5,
-              
             }}
           >
             "Save Before Jump Into Another Tab"
@@ -238,7 +239,6 @@ export default function Tabs() {
                 size="large"
                 variant="contained"
                 endIcon={<SendRoundedIcon />}
-                type="submit"
                 className=" rounded-3 text-white fw-bold fs-4"
                 onClick={() => updateTab(panel.id)}
                 style={{ width: "100%" }}

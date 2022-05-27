@@ -47,7 +47,6 @@ function ConfirmationDialogRaw(props) {
     const [user] = userInfo.filter((it) => it.userName === userName);
     if (user.password === value) {
       onClose(value);
-      console.log("handleOk");
     } else {
       handleClick();
     }
@@ -134,15 +133,12 @@ function ConfirmationDialogRaw(props) {
       <DialogActions>
         <TextField
           variant="outlined"
-          size="large"
+          size="medium"
           fullWidth
-          autoFocus={true}
           type="password"
-          inputProps={{ style: { fontSize: 15 } }}
           onChange={(event) => {
             setValue(event.target.value);
           }}
-          validation
         />
         <Button
           variant="contained"
