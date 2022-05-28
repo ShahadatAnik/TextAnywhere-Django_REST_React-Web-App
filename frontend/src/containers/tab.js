@@ -1,20 +1,14 @@
 import React, { useState, useEffect } from "react";
 import {
   Tab,
-  Grid,
   Button,
   TextField,
   Container,
-  Box,
   Typography,
   AppBar,
   Toolbar,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Dialog,
 } from "@mui/material";
-import PropTypes from "prop-types";
+
 import { TabList, TabContext, TabPanel } from "@mui/lab";
 import ApiService from "../ApiService";
 import { useParams, useNavigate } from "react-router-dom";
