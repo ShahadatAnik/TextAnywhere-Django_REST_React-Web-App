@@ -47,7 +47,9 @@ export default function Home() {
       ApiService.NewUser({
         userName,
         password,
-      }).then(navigate(`/${userName}`));
+      })
+        .then((resp) => set_user([...user, resp]))
+        .then(navigate(`/${userName}`));
     }
   };
 

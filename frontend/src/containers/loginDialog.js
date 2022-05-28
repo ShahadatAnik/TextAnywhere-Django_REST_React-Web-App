@@ -45,15 +45,16 @@ function ConfirmationDialogRaw(props) {
 
   const handleOk = () => {
     const [user] = userInfo.filter((it) => it.userName === userName);
+    // console.table(user);
     if (user.password === value) {
       onClose(value);
     } else {
       handleClick();
     }
-    if (user.length() < 0) {
-      // need to fix
-      alert("Wrong address");
-    }
+    // if (user.length() < 0) {
+    //   // need to fix
+    //   alert("Wrong address");
+    // }
 
     // console.log("")
   };
